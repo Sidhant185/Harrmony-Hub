@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { config } from "@/lib/config"
 
 export async function GET(req: Request) {
   try {
@@ -50,7 +51,7 @@ export async function GET(req: Request) {
                 filePath: true,
                 coverArt: true,
                 genre: true,
-                // uploaderId NOT included
+                playCount: true,
               },
             },
           },
@@ -62,7 +63,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ playlists })
   } catch (error) {
-    console.error("Error fetching playlists:", error)
     return NextResponse.json(
       { error: "Failed to fetch playlists" },
       { status: 500 }
@@ -118,6 +118,7 @@ export async function POST(req: Request) {
                 filePath: true,
                 coverArt: true,
                 genre: true,
+                playCount: true,
               },
             },
           },
@@ -127,7 +128,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ playlist }, { status: 201 })
   } catch (error) {
-    console.error("Error creating playlist:", error)
     return NextResponse.json(
       { error: "Failed to create playlist" },
       { status: 500 }

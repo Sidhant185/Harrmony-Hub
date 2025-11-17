@@ -32,8 +32,8 @@ export async function GET(req: Request) {
           filePath: true,
           coverArt: true,
           genre: true,
+          playCount: true,
           uploadedAt: true,
-          // uploaderId is NOT included
         },
       }),
       prisma.playlist.findMany({
@@ -57,7 +57,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ songs, playlists })
   } catch (error) {
-    console.error("Search error:", error)
     return NextResponse.json(
       { error: "Search failed" },
       { status: 500 }

@@ -28,15 +28,14 @@ export async function GET(req: Request) {
         filePath: true,
         coverArt: true,
         genre: true,
+        playCount: true,
         uploadedAt: true,
-        // uploaderId included here since user is viewing their own uploads
         uploaderId: true,
       },
     })
 
-    return NextResponse.json({ songs })
+    return NextResponse.json({ songs     })
   } catch (error) {
-    console.error("Error fetching user uploads:", error)
     return NextResponse.json(
       { error: "Failed to fetch uploads" },
       { status: 500 }

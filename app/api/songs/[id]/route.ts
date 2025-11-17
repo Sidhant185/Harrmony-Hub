@@ -19,8 +19,8 @@ export async function GET(
         filePath: true,
         coverArt: true,
         genre: true,
+        playCount: true,
         uploadedAt: true,
-        // uploaderId is NOT included - anonymous uploads
       },
     })
 
@@ -30,7 +30,6 @@ export async function GET(
 
     return NextResponse.json(song)
   } catch (error) {
-    console.error("Error fetching song:", error)
     return NextResponse.json(
       { error: "Failed to fetch song" },
       { status: 500 }
@@ -78,7 +77,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Song deleted successfully" })
   } catch (error) {
-    console.error("Error deleting song:", error)
     return NextResponse.json(
       { error: "Failed to delete song" },
       { status: 500 }

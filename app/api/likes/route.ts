@@ -46,7 +46,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "Song liked", liked: true })
   } catch (error) {
-    console.error("Error liking song:", error)
     return NextResponse.json(
       { error: "Failed to like song" },
       { status: 500 }
@@ -86,7 +85,6 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({ message: "Song unliked", liked: false })
   } catch (error) {
-    console.error("Error unliking song:", error)
     return NextResponse.json(
       { error: "Failed to unlike song" },
       { status: 500 }
@@ -134,6 +132,7 @@ export async function GET(req: Request) {
             filePath: true,
             coverArt: true,
             genre: true,
+            playCount: true,
             uploadedAt: true,
           },
         },
@@ -143,7 +142,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ likes })
   } catch (error) {
-    console.error("Error fetching likes:", error)
     return NextResponse.json(
       { error: "Failed to fetch likes" },
       { status: 500 }
