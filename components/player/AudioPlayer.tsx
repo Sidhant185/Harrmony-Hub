@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePlayerStore } from "@/lib/store/player-store"
 import { PlayerControls } from "./PlayerControls"
+import { PlayerModal } from "./PlayerModal"
 
 export function AudioPlayer() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   const {
     currentSong,
@@ -44,7 +46,9 @@ export function AudioPlayer() {
     if (!audio) return
 
     if (isPlaying) {
-      audio.play().catch(console.error)
+      audio.play().catch(() => {
+        // Error handled silently
+      })
     } else {
       audio.pause()
     }
@@ -63,6 +67,13 @@ export function AudioPlayer() {
     audio.src = currentSong.filePath
     audio.load()
     play()
+
+    // Track song play
+    fetch(`/api/songs/${currentSong.id}/play`, {
+      method: "POST",
+    }).catch(() => {
+      // Error handled silently
+    })
   }, [currentSong, play])
 
   if (!currentSong) return null
@@ -70,9 +81,13 @@ export function AudioPlayer() {
   return (
     <>
       <audio ref={audioRef} />
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t z-50">
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 z-50 cursor-pointer"
+        onClick={() => setIsModalOpen(true)}
+      >
         <PlayerControls />
       </div>
+      <PlayerModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   )
 }
