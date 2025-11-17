@@ -23,8 +23,8 @@ export function PlaylistCard({ playlist }: PlaylistCardProps) {
 
   return (
     <Link href={`/playlist/${playlist.id}`}>
-      <div className="group bg-card rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer">
-        <div className="relative aspect-square mb-3 rounded-md overflow-hidden bg-primary/10">
+      <div className="group bg-[#181818] rounded-lg p-4 hover:bg-[#282828] transition-colors cursor-pointer">
+        <div className="relative aspect-square mb-3 rounded-md overflow-hidden bg-[#333]">
           {playlist.coverArt ? (
             <Image
               src={playlist.coverArt}
@@ -34,18 +34,18 @@ export function PlaylistCard({ playlist }: PlaylistCardProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Music className="h-12 w-12 text-muted-foreground" />
+              <Music className="h-12 w-12 text-white/50" />
             </div>
           )}
         </div>
         <div className="space-y-1">
-          <h3 className="font-medium truncate">{playlist.name}</h3>
+          <h3 className="font-medium truncate text-white">{playlist.name}</h3>
           {playlist.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm text-white/70 line-clamp-2">
               {playlist.description}
             </p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white/70">
             {songCount} {songCount === 1 ? "song" : "songs"}
             {playlist.user?.name && ` • by ${playlist.user.name}`}
           </p>
