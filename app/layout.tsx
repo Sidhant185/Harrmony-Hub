@@ -7,7 +7,17 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HarmonyHub - Music Platform",
-  description: "Discover and share music anonymously",
+  description: "Discover and share music",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.svg", sizes: "32x32", type: "image/svg+xml" },
+      { url: "/favicon-16x16.svg", sizes: "16x16", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg", sizes: "180x180", type: "image/svg+xml" },
+    ],
+  },
 }
 
 export default function RootLayout({

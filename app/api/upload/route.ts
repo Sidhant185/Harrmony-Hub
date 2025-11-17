@@ -4,6 +4,7 @@ import { join } from "path"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { config } from "@/lib/config"
 
 export async function POST(req: Request) {
   try {
@@ -23,24 +24,22 @@ export async function POST(req: Request) {
     }
 
     // Validate file type
-    const allowedTypes = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/m4a"]
-    if (!allowedTypes.includes(file.type)) {
+    if (!config.upload.allowedAudioTypes.includes(file.type)) {
       return NextResponse.json(
         { error: "Invalid file type. Only audio files are allowed." },
         { status: 400 }
       )
     }
 
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024
-    if (file.size > maxSize) {
+    // Validate file size
+    if (file.size > config.upload.maxFileSize) {
       return NextResponse.json(
-        { error: "File size exceeds 50MB limit" },
+        { error: `File size exceeds ${Math.round(config.upload.maxFileSize / (1024 * 1024))}MB limit` },
         { status: 400 }
       )
     }
 
-    // Get session (optional - uploads can be anonymous)
+    // Get session
     const session = await getServerSession(authOptions)
     const uploaderId = session?.user?.id || null
 
@@ -72,9 +71,9 @@ export async function POST(req: Request) {
       coverArtPath = `/uploads/${coverFileName}`
     }
 
-    // Get audio duration (simplified - in production, use a library like node-ffprobe)
-    // For now, we'll set a default and let the client update it
-    const duration = 0 // Will be updated by client
+    // Get audio duration from form data (calculated client-side)
+    const durationStr = formData.get("duration") as string
+    const duration = durationStr ? parseInt(durationStr, 10) : 0
 
     // Create song record (uploaderId stored but never exposed in responses)
     const song = await prisma.song.create({
@@ -98,7 +97,6 @@ export async function POST(req: Request) {
       { status: 201 }
     )
   } catch (error) {
-    console.error("Upload error:", error)
     return NextResponse.json(
       { error: "Failed to upload song" },
       { status: 500 }
