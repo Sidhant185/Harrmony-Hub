@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { SongCard } from "@/components/song/SongCard"
 import { PlaylistCard } from "@/components/playlist/PlaylistCard"
+import { SongCardSkeleton, PlaylistCardSkeleton } from "@/components/ui/SkeletonLoader"
+import { config } from "@/lib/config"
 
 interface Song {
   id: string
@@ -35,8 +37,8 @@ export default function BrowsePage() {
     async function fetchData() {
       try {
         const [songsRes, playlistsRes] = await Promise.all([
-          fetch("/api/songs?limit=12"),
-          fetch("/api/playlists?isPublic=true&limit=6"),
+          fetch(`/api/songs?limit=${config.browse.recentSongsLimit}`),
+          fetch(`/api/playlists?isPublic=true&limit=${config.browse.featuredPlaylistsLimit}`),
         ])
 
         const songsData = await songsRes.json()
@@ -53,9 +55,9 @@ export default function BrowsePage() {
               .filter((g: string) => g) || []
           ),
         ] as string[]
-        setGenres(uniqueGenres.slice(0, 8))
+        setGenres(uniqueGenres.slice(0, config.browse.genresLimit))
       } catch (error) {
-        console.error("Error fetching data:", error)
+        // Error handled silently
       } finally {
         setLoading(false)
       }
@@ -67,7 +69,24 @@ export default function BrowsePage() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
+        <div className="space-y-12">
+          <section>
+            <h2 className="text-2xl font-bold mb-6 text-white">Recently Added</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Array.from({ length: config.browse.recentSongsLimit }).map((_, i) => (
+                <SongCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+          <section>
+            <h2 className="text-2xl font-bold mb-6 text-white">Featured Playlists</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Array.from({ length: config.browse.featuredPlaylistsLimit }).map((_, i) => (
+                <PlaylistCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     )
   }
@@ -76,7 +95,7 @@ export default function BrowsePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-12">
         <section>
-          <h2 className="text-2xl font-bold mb-6">Recently Added</h2>
+          <h2 className="text-2xl font-bold mb-6 text-white">Recently Added</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {recentSongs.map((song) => (
               <SongCard key={song.id} song={song} />
@@ -86,13 +105,13 @@ export default function BrowsePage() {
 
         {genres.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold mb-6">Browse by Genre</h2>
+            <h2 className="text-2xl font-bold mb-6 text-white">Browse by Genre</h2>
             <div className="flex flex-wrap gap-2">
               {genres.map((genre) => (
                 <a
                   key={genre}
                   href={`/search?q=${encodeURIComponent(genre)}`}
-                  className="px-4 py-2 bg-secondary rounded-full hover:bg-accent transition-colors"
+                  className="px-4 py-2 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors"
                 >
                   {genre}
                 </a>
@@ -103,7 +122,7 @@ export default function BrowsePage() {
 
         {featuredPlaylists.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold mb-6">Featured Playlists</h2>
+            <h2 className="text-2xl font-bold mb-6 text-white">Featured Playlists</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {featuredPlaylists.map((playlist) => (
                 <PlaylistCard key={playlist.id} playlist={playlist} />

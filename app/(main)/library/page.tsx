@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { SongCard } from "@/components/song/SongCard"
 import { PlaylistCard } from "@/components/playlist/PlaylistCard"
+import { SongCardSkeleton, PlaylistCardSkeleton } from "@/components/ui/SkeletonLoader"
+import { EmptyState } from "@/components/ui/EmptyState"
 import { Heart, Music } from "lucide-react"
 
 interface Song {
@@ -64,7 +66,7 @@ export default function LibraryPage() {
         setPlaylists(playlistsData.playlists || [])
       }
     } catch (error) {
-      console.error("Error fetching library:", error)
+      // Error handled silently
     } finally {
       setLoading(false)
     }
@@ -73,23 +75,52 @@ export default function LibraryPage() {
   if (status === "loading" || loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
+        <h1 className="text-3xl font-bold mb-8 text-white">Your Library</h1>
+        <div className="space-y-12">
+          <section>
+            <div className="flex items-center gap-2 mb-6">
+              <Heart className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold text-white">Liked Songs</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SongCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+          <section>
+            <div className="flex items-center gap-2 mb-6">
+              <Music className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold text-white">Your Playlists</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <PlaylistCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Your Library</h1>
+      <h1 className="text-3xl font-bold mb-8 text-white">Your Library</h1>
 
       <div className="space-y-12">
         <section>
           <div className="flex items-center gap-2 mb-6">
-            <Heart className="h-6 w-6 text-red-500" />
-            <h2 className="text-2xl font-bold">Liked Songs</h2>
+            <Heart className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold text-white">Liked Songs</h2>
           </div>
           {likedSongs.length === 0 ? (
-            <p className="text-muted-foreground">No liked songs yet.</p>
+            <EmptyState
+              icon="heart"
+              title="No liked songs yet"
+              description="Start exploring and like your favorite songs to see them here."
+              action={{ label: "Browse Music", href: "/browse" }}
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {likedSongs.map((song) => (
@@ -101,11 +132,16 @@ export default function LibraryPage() {
 
         <section>
           <div className="flex items-center gap-2 mb-6">
-            <Music className="h-6 w-6" />
-            <h2 className="text-2xl font-bold">Your Playlists</h2>
+            <Music className="h-6 w-6 text-white" />
+            <h2 className="text-2xl font-bold text-white">Your Playlists</h2>
           </div>
           {playlists.length === 0 ? (
-            <p className="text-muted-foreground">No playlists yet.</p>
+            <EmptyState
+              icon="music"
+              title="No playlists yet"
+              description="Create your first playlist to organize your favorite songs."
+              action={{ label: "Create Playlist", href: "/browse" }}
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {playlists.map((playlist) => (
