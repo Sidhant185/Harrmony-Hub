@@ -72,6 +72,7 @@ model Song {
   filePath    String    // Path to audio file
   coverArt    String?   // Path to cover art image
   genre       String?
+  playCount   Int       @default(0) // Total number of times played
   uploadedAt  DateTime  @default(now())
   uploaderId  String?   // Internal only, never exposed in API responses
   uploader    User?     @relation("SongUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
@@ -86,6 +87,7 @@ model Song {
   @@index([genre])
   @@index([uploadedAt])
   @@index([uploaderId])
+  @@index([playCount])
 }
 
 model Genre {
