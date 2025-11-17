@@ -45,8 +45,13 @@ export async function POST(req: Request) {
       { message: "User created successfully", userId: user.id },
       { status: 201 }
     )
-  } catch (error) {
-    console.error("Registration error:", error)
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -83,7 +83,6 @@ export async function POST(
         { status: 400 }
       )
     }
-    console.error("Error adding song to playlist:", error)
     return NextResponse.json(
       { error: "Failed to add song to playlist" },
       { status: 500 }
@@ -144,7 +143,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Song removed from playlist" })
   } catch (error) {
-    console.error("Error removing song from playlist:", error)
     return NextResponse.json(
       { error: "Failed to remove song from playlist" },
       { status: 500 }
