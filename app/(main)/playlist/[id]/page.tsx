@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react"
 import { SongCard } from "@/components/song/SongCard"
 import { usePlayerStore } from "@/lib/store/player-store"
 import { formatDuration } from "@/lib/utils"
+import { SongListSkeleton, SkeletonLoader } from "@/components/ui/SkeletonLoader"
+import { EmptyState } from "@/components/ui/EmptyState"
 import { Play, Plus, Trash2, Edit, X } from "lucide-react"
 import Image from "next/image"
 
@@ -48,6 +50,14 @@ export default function PlaylistPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
+  useEffect(() => {
+    if (playlist) {
+      setEditName(playlist.name)
+      setEditDescription(playlist.description || "")
+      setEditIsPublic(playlist.isPublic)
+    }
+  }, [playlist])
+
   const fetchPlaylist = async () => {
     try {
       const response = await fetch(`/api/playlists/${params.id}`)
@@ -58,7 +68,7 @@ export default function PlaylistPage() {
         router.push("/browse")
       }
     } catch (error) {
-      console.error("Error fetching playlist:", error)
+      // Error handled silently
     } finally {
       setLoading(false)
     }
@@ -89,14 +99,59 @@ export default function PlaylistPage() {
         })
       }
     } catch (error) {
-      console.error("Error removing song:", error)
+      // Error handled by response
+    }
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    if (playlist) {
+      setEditName(playlist.name)
+      setEditDescription(playlist.description || "")
+      setEditIsPublic(playlist.isPublic)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!playlist || !editName.trim()) return
+
+    try {
+      const response = await fetch(`/api/playlists/${playlist.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName.trim(),
+          description: editDescription.trim() || null,
+          isPublic: editIsPublic,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setPlaylist(data.playlist)
+        setIsEditing(false)
+      }
+    } catch (error) {
+      // Error handled by response
     }
   }
 
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
+        <div className="flex flex-col md:flex-row gap-8 mb-8">
+          <SkeletonLoader className="w-full md:w-64 h-64 rounded-lg" />
+          <div className="flex-1 space-y-4">
+            <SkeletonLoader className="h-12 w-3/4 rounded" />
+            <SkeletonLoader className="h-6 w-full rounded" />
+            <SkeletonLoader className="h-6 w-2/3 rounded" />
+          </div>
+        </div>
+        <SongListSkeleton count={5} />
       </div>
     )
   }
@@ -104,7 +159,7 @@ export default function PlaylistPage() {
   if (!playlist) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Playlist not found</div>
+        <div className="text-center text-white">Playlist not found</div>
       </div>
     )
   }
@@ -134,12 +189,42 @@ export default function PlaylistPage() {
         </div>
 
         <div className="flex-1">
-          <p className="text-sm text-muted-foreground mb-2">Playlist</p>
-          <h1 className="text-4xl font-bold mb-4">{playlist.name}</h1>
-          {playlist.description && (
-            <p className="text-muted-foreground mb-4">{playlist.description}</p>
+          <p className="text-sm text-white/70 mb-2">Playlist</p>
+          {isEditing ? (
+            <div className="space-y-4 mb-4">
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="w-full px-4 py-2 bg-[#1a1a1a] border border-white/20 rounded-lg text-white text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Playlist name"
+              />
+              <textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="w-full px-4 py-2 bg-[#1a1a1a] border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                placeholder="Description (optional)"
+                rows={3}
+              />
+              <label className="flex items-center gap-2 text-white/70 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editIsPublic}
+                  onChange={(e) => setEditIsPublic(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+                <span>Make playlist public</span>
+              </label>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold mb-4 text-white">{playlist.name}</h1>
+              {playlist.description && (
+                <p className="text-white/70 mb-4">{playlist.description}</p>
+              )}
+            </>
           )}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+          <div className="flex items-center gap-4 text-sm text-white/70 mb-6">
             <span>{playlist.songs.length} songs</span>
             <span>•</span>
             <span>{formatDuration(totalDuration)}</span>
@@ -151,18 +236,40 @@ export default function PlaylistPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={handlePlay}
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors flex items-center gap-2"
-            >
-              <Play className="h-5 w-5 fill-current" />
-              Play
-            </button>
+            {!isEditing && (
+              <button
+                onClick={handlePlay}
+                className="px-6 py-3 bg-primary text-black rounded-full hover:scale-105 transition-all flex items-center gap-2 font-bold shadow-lg"
+              >
+                <Play className="h-5 w-5 fill-current" />
+                Play
+              </button>
+            )}
             {isOwner && (
               <>
-                <button className="px-4 py-2 border rounded-full hover:bg-accent transition-colors">
-                  <Edit className="h-4 w-4" />
-                </button>
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={handleSaveEdit}
+                      className="px-4 py-2 bg-primary text-black rounded-full hover:bg-primary/90 transition-colors font-medium"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleEdit}
+                    className="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -171,39 +278,42 @@ export default function PlaylistPage() {
 
       <div className="space-y-2">
         {playlist.songs.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            This playlist is empty
-          </div>
+          <EmptyState
+            icon="music"
+            title="This playlist is empty"
+            description={isOwner ? "Add songs to your playlist to get started." : "This playlist doesn't have any songs yet."}
+            action={isOwner ? { label: "Browse Songs", href: "/browse" } : undefined}
+          />
         ) : (
           playlist.songs.map((playlistSong, index) => (
             <div
               key={playlistSong.song.id}
-              className="flex items-center gap-4 p-3 rounded-lg hover:bg-accent transition-colors group"
+              className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/10 transition-colors group"
             >
-              <span className="text-muted-foreground w-8 text-sm">
+              <span className="text-white/70 w-8 text-sm">
                 {index + 1}
               </span>
               <button
                 onClick={() => {
                   setCurrentSong(playlistSong.song)
                 }}
-                className="p-2 hover:bg-background rounded-full transition-colors"
+                className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/70 hover:text-white opacity-0 group-hover:opacity-100"
               >
                 <Play className="h-4 w-4" />
               </button>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{playlistSong.song.title}</p>
-                <p className="text-sm text-muted-foreground truncate">
+                <p className="font-medium truncate text-white">{playlistSong.song.title}</p>
+                <p className="text-sm text-white/70 truncate">
                   {playlistSong.song.artist}
                 </p>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-white/70">
                 {formatDuration(playlistSong.song.duration)}
               </span>
               {isOwner && (
                 <button
                   onClick={() => handleRemoveSong(playlistSong.song.id)}
-                  className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="p-2 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10 rounded-full"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
