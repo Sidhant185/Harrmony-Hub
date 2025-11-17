@@ -22,6 +22,7 @@ interface PlayerState {
   shuffle: boolean
   repeat: "off" | "all" | "one"
   setCurrentSong: (song: Song | null) => void
+  setCurrentIndex: (index: number) => void
   setQueue: (songs: Song[]) => void
   addToQueue: (song: Song) => void
   removeFromQueue: (index: number) => void
@@ -49,7 +50,18 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   shuffle: false,
   repeat: "off",
 
-  setCurrentSong: (song) => set({ currentSong: song }),
+  setCurrentSong: (song) => {
+    const state = get()
+    const index = state.queue.findIndex((s) => s.id === song?.id)
+    set({ currentSong: song, currentIndex: index >= 0 ? index : state.currentIndex })
+  },
+  
+  setCurrentIndex: (index) => {
+    const state = get()
+    if (index >= 0 && index < state.queue.length) {
+      set({ currentIndex: index, currentSong: state.queue[index] })
+    }
+  },
   
   setQueue: (songs) => {
     const shuffled = get().shuffle ? [...songs].sort(() => Math.random() - 0.5) : songs
