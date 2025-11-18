@@ -24,34 +24,72 @@ export async function GET(req: NextRequest) {
         startDate = undefined
     }
 
-    let where: any = {}
-
     if (startDate) {
-      // Get songs that have been played in the period
-      const playHistorySongs = await prisma.playHistory.findMany({
+      // For time periods, count plays within that period
+      const playCounts = await prisma.playHistory.groupBy({
+        by: ["songId"],
         where: {
           playedAt: {
             gte: startDate,
           },
         },
-        select: {
+        _count: {
           songId: true,
         },
-        distinct: ["songId"],
+        orderBy: {
+          _count: {
+            songId: "desc",
+          },
+        },
+        take: limit,
       })
 
-      const songIds = playHistorySongs.map((ph) => ph.songId)
-
-      if (songIds.length === 0) {
+      if (playCounts.length === 0) {
         return NextResponse.json({ songs: [], period })
       }
 
-      where.id = { in: songIds }
+      const songIds = playCounts.map((pc) => pc.songId)
+      const playCountMap = new Map(
+        playCounts.map((pc) => [pc.songId, pc._count.songId])
+      )
+
+      // Get songs with their full data
+      const songs = await prisma.song.findMany({
+        where: {
+          id: { in: songIds },
+        },
+        select: {
+          id: true,
+          title: true,
+          artist: true,
+          album: true,
+          duration: true,
+          filePath: true,
+          coverArt: true,
+          genre: true,
+          playCount: true,
+          uploadedAt: true,
+        },
+      })
+
+      // Sort by period play count and add period play count
+      const songsWithPeriodCount = songs
+        .map((song) => ({
+          ...song,
+          periodPlayCount: playCountMap.get(song.id) || 0,
+        }))
+        .sort((a, b) => b.periodPlayCount - a.periodPlayCount)
+
+      return NextResponse.json({ songs: songsWithPeriodCount, period })
     }
 
-    // Get top songs by play count
+    // For "all" period, use total playCount
     const songs = await prisma.song.findMany({
-      where,
+      where: {
+        playCount: {
+          gt: 0, // Only songs that have been played
+        },
+      },
       take: limit,
       orderBy: { playCount: "desc" },
       select: {

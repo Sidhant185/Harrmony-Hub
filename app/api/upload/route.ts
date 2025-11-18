@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { config } from "@/lib/config"
+import { uploadToS3, generateS3Key } from "@/lib/s3"
 
 export async function POST(req: Request) {
   try {
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     // Validate file type
-    if (!config.upload.allowedAudioTypes.includes(file.type)) {
+    if (!config.upload.allowedAudioTypes.includes(file.type as any)) {
       return NextResponse.json(
         { error: "Invalid file type. Only audio files are allowed." },
         { status: 400 }
@@ -43,32 +42,26 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
     const uploaderId = session?.user?.id || null
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), "public", "uploads")
-    await mkdir(uploadsDir, { recursive: true })
-
     // Generate unique filename
-    const timestamp = Date.now()
     const sanitizedTitle = title.replace(/[^a-z0-9]/gi, "_").toLowerCase()
     const fileExtension = file.name.split(".").pop()
-    const fileName = `${sanitizedTitle}_${timestamp}.${fileExtension}`
-    const filePath = join(uploadsDir, fileName)
+    const audioFileName = `${sanitizedTitle}_${Date.now()}.${fileExtension}`
+    
+    // Upload audio file to S3
+    const audioBytes = await file.arrayBuffer()
+    const audioBuffer = Buffer.from(audioBytes)
+    const audioS3Key = generateS3Key("audio", audioFileName)
+    const audioUrl = await uploadToS3(audioBuffer, audioS3Key, file.type)
 
-    // Save file
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
-
-    // Save cover art if provided
-    let coverArtPath: string | null = null
+    // Upload cover art to S3 if provided
+    let coverArtUrl: string | null = null
     if (coverArt && coverArt.size > 0) {
       const coverExtension = coverArt.name.split(".").pop()
-      const coverFileName = `${sanitizedTitle}_cover_${timestamp}.${coverExtension}`
-      const coverPath = join(uploadsDir, coverFileName)
+      const coverFileName = `${sanitizedTitle}_cover_${Date.now()}.${coverExtension}`
       const coverBytes = await coverArt.arrayBuffer()
       const coverBuffer = Buffer.from(coverBytes)
-      await writeFile(coverPath, coverBuffer)
-      coverArtPath = `/uploads/${coverFileName}`
+      const coverS3Key = generateS3Key("covers", coverFileName)
+      coverArtUrl = await uploadToS3(coverBuffer, coverS3Key, coverArt.type)
     }
 
     // Get audio duration from form data (calculated client-side)
@@ -83,8 +76,8 @@ export async function POST(req: Request) {
         album: album || null,
         genre: genre || null,
         duration,
-        filePath: `/uploads/${fileName}`,
-        coverArt: coverArtPath,
+        filePath: audioUrl, // Store S3 URL
+        coverArt: coverArtUrl, // Store S3 URL
         uploaderId, // Internal only
       },
     })
@@ -96,9 +89,10 @@ export async function POST(req: Request) {
       { message: "Song uploaded successfully", song: songResponse },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Upload error:", error)
     return NextResponse.json(
-      { error: "Failed to upload song" },
+      { error: error.message || "Failed to upload song" },
       { status: 500 }
     )
   }

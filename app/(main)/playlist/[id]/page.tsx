@@ -8,7 +8,8 @@ import { usePlayerStore } from "@/lib/store/player-store"
 import { formatDuration } from "@/lib/utils"
 import { SongListSkeleton, SkeletonLoader } from "@/components/ui/SkeletonLoader"
 import { EmptyState } from "@/components/ui/EmptyState"
-import { Play, Plus, Trash2, Edit, X } from "lucide-react"
+import { useToast } from "@/components/ui/ToastProvider"
+import { Play, Plus, Trash2, Edit, X, Share2 } from "lucide-react"
 import Image from "next/image"
 
 interface Song {
@@ -38,6 +39,7 @@ export default function PlaylistPage() {
   const router = useRouter()
   const { data: session } = useSession()
   const { setCurrentSong, setQueue } = usePlayerStore()
+  const { showToast } = useToast()
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -140,6 +142,34 @@ export default function PlaylistPage() {
     }
   }
 
+  const handleShare = async () => {
+    if (!playlist) return
+    const shareUrl = `${window.location.origin}/playlist/${playlist.id}`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: playlist.name,
+          text: `Check out "${playlist.name}" playlist on HarmonyHub!`,
+          url: shareUrl,
+        })
+      } catch (error) {
+        // User cancelled or error occurred, fall back to clipboard
+        copyToClipboard(shareUrl)
+      }
+    } else {
+      copyToClipboard(shareUrl)
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Link copied to clipboard!', 'success')
+    }).catch(() => {
+      showToast('Failed to copy link', 'error')
+    })
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -172,8 +202,8 @@ export default function PlaylistPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-8 mb-8">
-        <div className="relative w-full md:w-64 h-64 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8 mb-6 md:mb-8">
+        <div className="relative w-full md:w-64 h-48 sm:h-64 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
           {playlist.coverArt ? (
             <Image
               src={playlist.coverArt}
@@ -218,7 +248,7 @@ export default function PlaylistPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-4xl font-bold mb-4 text-white">{playlist.name}</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-white break-words">{playlist.name}</h1>
               {playlist.description && (
                 <p className="text-white/70 mb-4">{playlist.description}</p>
               )}
@@ -235,15 +265,24 @@ export default function PlaylistPage() {
               </>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             {!isEditing && (
-              <button
-                onClick={handlePlay}
-                className="px-6 py-3 bg-primary text-black rounded-full hover:scale-105 transition-all flex items-center gap-2 font-bold shadow-lg"
-              >
-                <Play className="h-5 w-5 fill-current" />
-                Play
-              </button>
+              <>
+                <button
+                  onClick={handlePlay}
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-black rounded-full hover:scale-105 transition-all flex items-center gap-2 font-bold shadow-lg text-sm sm:text-base"
+                >
+                  <Play className="h-4 w-4 sm:h-5 sm:w-5 fill-current" />
+                  <span className="hidden sm:inline">Play</span>
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="px-3 sm:px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white flex items-center gap-2 text-sm"
+                >
+                  <Share2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+              </>
             )}
             {isOwner && (
               <>
@@ -251,13 +290,13 @@ export default function PlaylistPage() {
                   <>
                     <button
                       onClick={handleSaveEdit}
-                      className="px-4 py-2 bg-primary text-black rounded-full hover:bg-primary/90 transition-colors font-medium"
+                      className="px-3 sm:px-4 py-2 bg-primary text-black rounded-full hover:bg-primary/90 transition-colors font-medium text-sm"
                     >
                       Save
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white"
+                      className="px-3 sm:px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white text-sm"
                     >
                       Cancel
                     </button>
@@ -265,7 +304,7 @@ export default function PlaylistPage() {
                 ) : (
                   <button
                     onClick={handleEdit}
-                    className="px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white"
+                    className="px-3 sm:px-4 py-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors text-white"
                   >
                     <Edit className="h-4 w-4" />
                   </button>

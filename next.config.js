@@ -1,7 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.r2.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.r2.cloudflarestorage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cloudflare.com',
+      },
+    ],
   },
   experimental: {
     serverActions: {

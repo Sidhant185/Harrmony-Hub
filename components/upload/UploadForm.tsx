@@ -77,7 +77,7 @@ export function UploadForm({ onSuccess }: UploadFormProps = {}) {
       return
     }
 
-    if (!config.upload.allowedImageTypes.includes(file.type)) {
+    if (!config.upload.allowedImageTypes.includes(file.type as any)) {
       setError("Invalid image type. Please use JPEG, PNG, or WebP.")
       return
     }
@@ -111,7 +111,7 @@ export function UploadForm({ onSuccess }: UploadFormProps = {}) {
       return
     }
 
-    if (!config.upload.allowedAudioTypes.includes(audioFile.type)) {
+    if (!config.upload.allowedAudioTypes.includes(audioFile.type as any)) {
       setError("Invalid audio file type. Please use MP3, WAV, OGG, M4A, AAC, or FLAC.")
       return
     }

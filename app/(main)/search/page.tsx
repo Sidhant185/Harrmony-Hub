@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { SongCard } from "@/components/song/SongCard"
 import { PlaylistCard } from "@/components/playlist/PlaylistCard"
@@ -30,7 +30,7 @@ interface Playlist {
   user?: { name?: string }
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [query, setQuery] = useState(searchParams.get("q") || "")
@@ -116,8 +116,8 @@ export default function SearchPage() {
               name="q"
               value={query}
               onChange={handleInputChange}
-              placeholder="Search for songs, artists, albums, or playlists..."
-              className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-white/50"
+              placeholder="Search songs, artists..."
+              className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-white/50 text-sm sm:text-base"
             />
         </form>
       </div>
@@ -125,16 +125,16 @@ export default function SearchPage() {
         {loading ? (
           <div className="space-y-8">
             <section>
-              <h2 className="text-2xl font-bold mb-6 text-white">Songs</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Songs</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SongCardSkeleton key={i} />
                 ))}
               </div>
             </section>
             <section>
-              <h2 className="text-2xl font-bold mb-6 text-white">Playlists</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Playlists</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <PlaylistCardSkeleton key={i} />
                 ))}
@@ -145,8 +145,8 @@ export default function SearchPage() {
         <div className="space-y-8">
           {songs.length > 0 && (
             <section>
-              <h2 className="text-2xl font-bold mb-6 text-white">Songs</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Songs</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {songs.map((song) => (
                   <SongCard key={song.id} song={song} />
                 ))}
@@ -156,8 +156,8 @@ export default function SearchPage() {
 
           {playlists.length > 0 && (
             <section>
-              <h2 className="text-2xl font-bold mb-6 text-white">Playlists</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Playlists</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {playlists.map((playlist) => (
                   <PlaylistCard key={playlist.id} playlist={playlist} />
                 ))}
@@ -183,6 +183,33 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="relative">
+            <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/70" />
+            <div className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg animate-pulse" />
+          </div>
+        </div>
+        <div className="space-y-8">
+          <section>
+            <div className="h-8 bg-white/10 rounded w-32 mb-6 animate-pulse" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SongCardSkeleton key={i} />
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   )
 }
 

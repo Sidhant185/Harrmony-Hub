@@ -58,6 +58,9 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
 
   if (!isOpen || !currentSong) return null
 
+  // Use song duration as fallback if audio duration isn't loaded yet
+  const displayDuration = duration || currentSong.duration || 0
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value)
     setCurrentTime(newTime)
@@ -189,14 +192,14 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
               <input
                 type="range"
                 min="0"
-                max={duration || 0}
+                max={displayDuration || 0}
                 value={currentTime}
                 onChange={handleSeek}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
               <div className="flex justify-between text-xs text-white/70 mt-2">
                 <span>{formatDuration(currentTime)}</span>
-                <span>{formatDuration(duration)}</span>
+                <span>{formatDuration(displayDuration)}</span>
               </div>
             </div>
 

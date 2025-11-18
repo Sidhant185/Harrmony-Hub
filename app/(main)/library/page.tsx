@@ -82,7 +82,7 @@ export default function LibraryPage() {
               <Heart className="h-6 w-6 text-primary" />
               <h2 className="text-2xl font-bold text-white">Liked Songs</h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <SongCardSkeleton key={i} />
               ))}
@@ -93,7 +93,7 @@ export default function LibraryPage() {
               <Music className="h-6 w-6 text-white" />
               <h2 className="text-2xl font-bold text-white">Your Playlists</h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <PlaylistCardSkeleton key={i} />
               ))}
@@ -122,7 +122,7 @@ export default function LibraryPage() {
               action={{ label: "Browse Music", href: "/browse" }}
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {likedSongs.map((song) => (
                 <SongCard key={song.id} song={song} />
               ))}
@@ -143,7 +143,7 @@ export default function LibraryPage() {
               action={{ label: "Create Playlist", href: "/browse" }}
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {playlists.map((playlist) => (
                 <PlaylistCard key={playlist.id} playlist={playlist} />
               ))}

@@ -113,7 +113,7 @@ export default function ProfilePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <EmptyState
-          icon="user"
+          icon="music"
           title="Profile not found"
           description="Unable to load your profile information."
         />
@@ -133,20 +133,20 @@ export default function ProfilePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
-        <div className="flex items-center gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
           {profileData.user.image ? (
             <img
               src={profileData.user.image}
               alt={profileData.user.name || "User"}
-              className="w-24 h-24 rounded-full"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center">
-              <User className="h-12 w-12 text-black" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary flex items-center justify-center">
+              <User className="h-10 w-10 sm:h-12 sm:w-12 text-black" />
             </div>
           )}
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               {profileData.user.name || "User"}
             </h1>
             <p className="text-white/70 mb-1">{profileData.user.email}</p>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div className="bg-[#121212] rounded-lg p-4 border border-white/10">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="h-5 w-5 text-primary" />
@@ -238,7 +238,7 @@ export default function ProfilePage() {
               description="Start playing songs to see your listening history here."
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {profileData.recentHistory.map((item) => (
                 <SongCard key={item.id} song={item.song} />
               ))}
@@ -252,7 +252,7 @@ export default function ProfilePage() {
               description="Like songs to see them here."
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {likedSongs.map((like) => (
                 <SongCard key={like.id} song={like.song} />
               ))}

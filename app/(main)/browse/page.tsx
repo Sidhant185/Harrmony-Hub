@@ -79,8 +79,8 @@ export default function BrowsePage() {
             </div>
           </section>
           <section>
-            <h2 className="text-2xl font-bold mb-6 text-white">Featured Playlists</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Featured Playlists</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: config.browse.featuredPlaylistsLimit }).map((_, i) => (
                 <PlaylistCardSkeleton key={i} />
               ))}
@@ -95,8 +95,8 @@ export default function BrowsePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-12">
         <section>
-          <h2 className="text-2xl font-bold mb-6 text-white">Recently Added</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Recently Added</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {recentSongs.map((song) => (
               <SongCard key={song.id} song={song} />
             ))}
@@ -105,7 +105,7 @@ export default function BrowsePage() {
 
         {genres.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold mb-6 text-white">Browse by Genre</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Browse by Genre</h2>
             <div className="flex flex-wrap gap-2">
               {genres.map((genre) => (
                 <a
@@ -122,8 +122,8 @@ export default function BrowsePage() {
 
         {featuredPlaylists.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold mb-6 text-white">Featured Playlists</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white">Featured Playlists</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {featuredPlaylists.map((playlist) => (
                 <PlaylistCard key={playlist.id} playlist={playlist} />
               ))}

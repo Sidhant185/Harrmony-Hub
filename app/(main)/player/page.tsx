@@ -41,6 +41,9 @@ export default function PlayerPage() {
     return null
   }
 
+  // Use song duration as fallback if audio duration isn't loaded yet
+  const displayDuration = duration || currentSong.duration || 0
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value)
     setCurrentTime(newTime)
@@ -61,22 +64,22 @@ export default function PlayerPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
             <button
               onClick={() => router.back()}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
-            <h1 className="text-xl font-bold">Now Playing</h1>
+            <h1 className="text-lg sm:text-xl font-bold">Now Playing</h1>
             <div className="w-9" /> {/* Spacer */}
           </div>
 
           {/* Main Content */}
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
             {/* Left: Album Art & Song Info */}
             <div className="flex flex-col items-center">
-              <div className="relative w-full max-w-md aspect-square mb-6 rounded-lg overflow-hidden bg-[#333] shadow-2xl">
+              <div className="relative w-full max-w-xs sm:max-w-md aspect-square mb-4 sm:mb-6 rounded-lg overflow-hidden bg-[#333] shadow-2xl">
                 {currentSong.coverArt ? (
                   <Image
                     src={currentSong.coverArt}
@@ -90,9 +93,9 @@ export default function PlayerPage() {
                   </div>
                 )}
               </div>
-              <div className="text-center w-full">
-                <h2 className="text-2xl font-bold mb-2">{currentSong.title}</h2>
-                <p className="text-white/70 text-lg mb-1">{currentSong.artist}</p>
+              <div className="text-center w-full px-4">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2 break-words">{currentSong.title}</h2>
+                <p className="text-white/70 text-base sm:text-lg mb-1">{currentSong.artist}</p>
                 {currentSong.album && (
                   <p className="text-white/50 text-sm">{currentSong.album}</p>
                 )}
@@ -168,14 +171,14 @@ export default function PlayerPage() {
               <input
                 type="range"
                 min="0"
-                max={duration || 0}
+                max={displayDuration || 0}
                 value={currentTime}
                 onChange={handleSeek}
                 className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
               <div className="flex justify-between text-xs text-white/70 mt-2">
                 <span>{formatDuration(currentTime)}</span>
-                <span>{formatDuration(duration)}</span>
+                <span>{formatDuration(displayDuration)}</span>
               </div>
             </div>
 

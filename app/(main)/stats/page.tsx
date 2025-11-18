@@ -16,6 +16,7 @@ interface Song {
   coverArt?: string
   genre?: string
   playCount: number
+  periodPlayCount?: number // Play count for the selected period
 }
 
 export default function StatsPage() {
@@ -63,7 +64,7 @@ export default function StatsPage() {
             <TrendingUp className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Top Songs</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Top Songs</h1>
             <p className="text-white/70">Most played tracks</p>
           </div>
         </div>
@@ -86,7 +87,7 @@ export default function StatsPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
           {Array.from({ length: 12 }).map((_, i) => (
             <SongCardSkeleton key={i} />
           ))}
@@ -99,7 +100,7 @@ export default function StatsPage() {
         />
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {topSongs.map((song, index) => (
               <div key={song.id} className="relative">
                 <SongCard song={song} />
@@ -107,7 +108,7 @@ export default function StatsPage() {
                   #{index + 1}
                 </div>
                 <div className="absolute top-2 right-2 bg-primary/90 text-black text-xs font-bold px-2 py-1 rounded-full">
-                  {song.playCount} plays
+                  {song.periodPlayCount || song.playCount} plays
                 </div>
               </div>
             ))}

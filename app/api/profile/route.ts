@@ -36,7 +36,15 @@ export async function GET(req: Request) {
         include: {
           song: {
             select: {
+              id: true,
+              title: true,
+              artist: true,
+              album: true,
               duration: true,
+              filePath: true,
+              coverArt: true,
+              genre: true,
+              playCount: true,
             },
           },
         },
@@ -77,7 +85,10 @@ export async function GET(req: Request) {
         id: h.id,
         songId: h.songId,
         playedAt: h.playedAt,
-        song: h.song,
+        song: {
+          ...h.song,
+          playCount: h.song.playCount || 0,
+        },
       })),
     })
   } catch (error) {

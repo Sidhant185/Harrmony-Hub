@@ -53,7 +53,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   setCurrentSong: (song) => {
     const state = get()
     const index = state.queue.findIndex((s) => s.id === song?.id)
-    set({ currentSong: song, currentIndex: index >= 0 ? index : state.currentIndex })
+    set({ 
+      currentSong: song, 
+      currentIndex: index >= 0 ? index : state.currentIndex,
+      duration: song?.duration || state.duration, // Initialize duration from song
+      currentTime: 0, // Reset current time when song changes
+    })
   },
   
   setCurrentIndex: (index) => {

@@ -113,7 +113,7 @@ export default function UploadPage() {
                 <Music className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold mb-2 text-white">Upload Your Music</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Upload Your Music</h1>
             <p className="text-white/70">
               Share your music with the world.
             </p>
@@ -128,12 +128,12 @@ export default function UploadPage() {
         <div>
           <div className="flex items-center gap-3 mb-6">
             <UploadIcon className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-bold text-white">My Uploads</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">My Uploads</h2>
             <span className="text-white/70">({songs.length})</span>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <SongCardSkeleton key={i} />
               ))}
@@ -145,7 +145,7 @@ export default function UploadPage() {
               description="Upload your first song to get started."
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {songs.map((song) => (
                 <div key={song.id} className="relative group">
                   <SongCard song={song} />

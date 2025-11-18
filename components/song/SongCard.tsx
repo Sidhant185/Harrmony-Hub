@@ -2,10 +2,11 @@
 
 import { usePlayerStore } from "@/lib/store/player-store"
 import { formatDuration } from "@/lib/utils"
-import { Play, Heart, MoreVertical, Plus } from "lucide-react"
+import { Play, Heart, MoreVertical, Plus, Share2 } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
+import { useToast } from "@/components/ui/ToastProvider"
 
 interface SongCardProps {
   song: {
@@ -34,6 +35,7 @@ export function SongCard({ song, onPlay }: SongCardProps) {
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession()
+  const { showToast } = useToast()
 
   const handlePlay = () => {
     setCurrentSong(song)
@@ -126,6 +128,34 @@ export function SongCard({ song, onPlay }: SongCardProps) {
     }
   }
 
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const shareUrl = `${window.location.origin}/browse?song=${song.id}`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${song.title} by ${song.artist}`,
+          text: `Check out "${song.title}" by ${song.artist} on HarmonyHub!`,
+          url: shareUrl,
+        })
+      } catch (error) {
+        // User cancelled or error occurred, fall back to clipboard
+        copyToClipboard(shareUrl)
+      }
+    } else {
+      copyToClipboard(shareUrl)
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Link copied to clipboard!', 'success')
+    }).catch(() => {
+      showToast('Failed to copy link', 'error')
+    })
+  }
+
   const isCurrentlyPlaying = currentSong?.id === song.id && isPlaying
 
   return (
@@ -161,10 +191,7 @@ export function SongCard({ song, onPlay }: SongCardProps) {
       <div className="space-y-1">
         <h3 className="font-medium truncate text-white">{song.title}</h3>
         <p className="text-sm text-white/70 truncate">{song.artist}</p>
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-white/70">
-            {formatDuration(song.duration)}
-          </span>
+        <div className="flex items-center justify-end mt-2">
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {session && (
               <button
@@ -188,18 +215,27 @@ export function SongCard({ song, onPlay }: SongCardProps) {
               >
                 <MoreVertical className="h-4 w-4" />
               </button>
-              {showMenu && session && (
+              {showMenu && (
                 <div className="absolute bottom-full right-0 mb-2 bg-[#282828] rounded-lg shadow-xl py-2 min-w-[180px] z-50 border border-white/10">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowPlaylistMenu(!showPlaylistMenu)
-                    }}
+                    onClick={handleShare}
                     className="w-full px-4 py-2 text-left text-white hover:bg-white/10 transition-colors flex items-center gap-2 text-sm"
                   >
-                    <Plus className="h-4 w-4" />
-                    Add to Playlist
+                    <Share2 className="h-4 w-4" />
+                    Share
                   </button>
+                  {session && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowPlaylistMenu(!showPlaylistMenu)
+                      }}
+                      className="w-full px-4 py-2 text-left text-white hover:bg-white/10 transition-colors flex items-center gap-2 text-sm"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add to Playlist
+                    </button>
+                  )}
                   {showPlaylistMenu && (
                     <div className="absolute bottom-full right-0 mb-2 bg-[#181818] rounded-lg shadow-xl py-2 min-w-[200px] max-h-[300px] overflow-y-auto border border-white/10">
                       {playlists.length === 0 ? (
