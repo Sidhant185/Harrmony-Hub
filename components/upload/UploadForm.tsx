@@ -78,8 +78,13 @@ export function UploadForm({ onSuccess }: UploadFormProps = {}) {
       return
     }
 
-    if (!config.upload.allowedImageTypes.includes(file.type as any)) {
-      setError("Invalid image type. Please use JPEG, PNG, or WebP.")
+    // Check both MIME type and file extension (browsers report MIME types differently)
+    const imageFileExt = file.name.split(".").pop()?.toLowerCase()
+    const isValidImageMimeType = config.upload.allowedImageTypes.includes(file.type as any)
+    const isValidImageExtension = imageFileExt && config.upload.allowedImageExtensions.includes(imageFileExt as any)
+    
+    if (!isValidImageMimeType && !isValidImageExtension) {
+      setError(`Invalid image type. Please use JPEG, PNG, WebP, or GIF. Detected: ${file.type || imageFileExt || "unknown"}`)
       return
     }
 
@@ -112,8 +117,13 @@ export function UploadForm({ onSuccess }: UploadFormProps = {}) {
       return
     }
 
-    if (!config.upload.allowedAudioTypes.includes(audioFile.type as any)) {
-      setError("Invalid audio file type. Please use MP3, WAV, OGG, M4A, AAC, or FLAC.")
+    // Check both MIME type and file extension (browsers report MIME types differently)
+    const audioFileExt = audioFile.name.split(".").pop()?.toLowerCase()
+    const isValidMimeType = config.upload.allowedAudioTypes.includes(audioFile.type as any)
+    const isValidExtension = audioFileExt && config.upload.allowedAudioExtensions.includes(audioFileExt as any)
+    
+    if (!isValidMimeType && !isValidExtension) {
+      setError(`Invalid audio file type. Please use MP3, WAV, OGG, M4A, AAC, FLAC, WEBM, or MP4. Detected: ${audioFile.type || audioFileExt || "unknown"}`)
       return
     }
 

@@ -14,6 +14,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.cloudflare.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.googleusercontent.com',
+      },
     ],
   },
   experimental: {

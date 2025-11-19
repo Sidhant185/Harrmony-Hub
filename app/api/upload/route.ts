@@ -22,10 +22,14 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate file type
-    if (!config.upload.allowedAudioTypes.includes(file.type as any)) {
+    // Validate file type (check both MIME type and extension)
+    const audioFileExtension = file.name.split(".").pop()?.toLowerCase()
+    const isValidMimeType = config.upload.allowedAudioTypes.includes(file.type as any)
+    const isValidExtension = audioFileExtension && config.upload.allowedAudioExtensions.includes(audioFileExtension as any)
+    
+    if (!isValidMimeType && !isValidExtension) {
       return NextResponse.json(
-        { error: "Invalid file type. Only audio files are allowed." },
+        { error: `Invalid file type. Please use MP3, WAV, OGG, M4A, AAC, FLAC, WEBM, or MP4. Detected: ${file.type || audioFileExtension || "unknown"}` },
         { status: 400 }
       )
     }
@@ -44,8 +48,8 @@ export async function POST(req: Request) {
 
     // Generate unique filename
     const sanitizedTitle = title.replace(/[^a-z0-9]/gi, "_").toLowerCase()
-    const fileExtension = file.name.split(".").pop()
-    const audioFileName = `${sanitizedTitle}_${Date.now()}.${fileExtension}`
+    const audioFileExt = file.name.split(".").pop()
+    const audioFileName = `${sanitizedTitle}_${Date.now()}.${audioFileExt}`
     
     // Upload audio file to S3
     const audioBytes = await file.arrayBuffer()
