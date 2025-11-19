@@ -1,29 +1,45 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
-import { Music, Search, Library, Upload, User, LogOut, Moon, Sun, Menu, X, Shield } from "lucide-react"
-import { useTheme } from "next-themes"
-import { useState, useEffect } from "react"
-import { usePlayerStore } from "@/lib/store/player-store"
-import { isAdmin } from "@/lib/admin"
+import Link from "next/link";
+import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
+import {
+  Music,
+  Search,
+  Library,
+  Upload,
+  User,
+  LogOut,
+  Moon,
+  Sun,
+  Menu,
+  X,
+  Shield,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { usePlayerStore } from "@/lib/store/player-store";
+import { isAdmin } from "@/lib/admin";
 
 export function Navbar() {
-  const { data: session } = useSession()
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { currentSong } = usePlayerStore()
+  const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { currentSong } = usePlayerStore();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-40 bg-black/80 backdrop-blur-sm border-b border-white/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/browse" className="flex items-center gap-2 font-bold text-xl text-white">
+          <Link
+            href="/browse"
+            className="flex items-center gap-2 font-bold text-xl text-white"
+          >
             <Music className="h-6 w-6 text-primary" />
             <span className="hidden sm:inline">HarmonyHub</span>
             <span className="sm:hidden">HH</span>
@@ -103,9 +119,11 @@ export function Navbar() {
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 >
                   {session.user?.image ? (
-                    <img
+                    <Image
                       src={session.user.image}
                       alt={session.user.name || "User"}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full"
                     />
                   ) : (
@@ -113,7 +131,9 @@ export function Navbar() {
                       <User className="h-4 w-4 text-black" />
                     </div>
                   )}
-                  <span className="text-sm text-white">{session.user?.name}</span>
+                  <span className="text-sm text-white">
+                    {session.user?.name}
+                  </span>
                 </Link>
                 <button
                   onClick={() => signOut()}
@@ -146,7 +166,11 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors text-white"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
 
@@ -215,7 +239,9 @@ export function Navbar() {
               <div className="flex items-center justify-between pt-2 border-t border-white/10">
                 {mounted && (
                   <button
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
                     className="p-2 hover:bg-accent rounded-full transition-colors"
                   >
                     {theme === "dark" ? (
@@ -233,9 +259,11 @@ export function Navbar() {
                       className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
                       {session.user?.image ? (
-                        <img
+                        <Image
                           src={session.user.image}
                           alt={session.user.name || "User"}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full"
                         />
                       ) : (
@@ -243,12 +271,14 @@ export function Navbar() {
                           <User className="h-4 w-4 text-black" />
                         </div>
                       )}
-                      <span className="text-sm text-white">{session.user?.name}</span>
+                      <span className="text-sm text-white">
+                        {session.user?.name}
+                      </span>
                     </Link>
                     <button
                       onClick={() => {
-                        signOut()
-                        setMobileMenuOpen(false)
+                        signOut();
+                        setMobileMenuOpen(false);
                       }}
                       className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
                       title="Sign out"
@@ -280,6 +310,5 @@ export function Navbar() {
         )}
       </div>
     </nav>
-  )
+  );
 }
-

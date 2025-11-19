@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { SongCard } from "@/components/song/SongCard"
 import { SongCardSkeleton } from "@/components/ui/SkeletonLoader"
 import { EmptyState } from "@/components/ui/EmptyState"
@@ -135,9 +136,11 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
           {profileData.user.image ? (
-            <img
+            <Image
               src={profileData.user.image}
               alt={profileData.user.name || "User"}
+              width={96}
+              height={96}
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-full"
             />
           ) : (

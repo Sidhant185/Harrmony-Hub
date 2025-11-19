@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
+import Image from "next/image"
 import { Upload, X, Music, Image as ImageIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { config } from "@/lib/config"
@@ -324,10 +325,11 @@ export function UploadForm({ onSuccess }: UploadFormProps = {}) {
           {coverPreview ? (
             <div className="space-y-2">
               <div className="relative w-32 h-32 mx-auto rounded-lg overflow-hidden">
-                <img
+                <Image
                   src={coverPreview}
                   alt="Cover preview"
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <div className="flex items-center justify-center gap-2">

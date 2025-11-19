@@ -1,69 +1,72 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { Music, Share2, MoreVertical } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
-import { useToast } from "@/components/ui/ToastProvider"
+import Link from "next/link";
+import Image from "next/image";
+import { Music, Share2, MoreVertical } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface PlaylistCardProps {
   playlist: {
-    id: string
-    name: string
-    description?: string
-    coverArt?: string
-    isPublic: boolean
-    songs?: Array<{ song: any }>
+    id: string;
+    name: string;
+    description?: string;
+    coverArt?: string;
+    isPublic: boolean;
+    songs?: Array<{ song: any }>;
     user?: {
-      name?: string
-    }
-  }
+      name?: string;
+    };
+  };
 }
 
 export function PlaylistCard({ playlist }: PlaylistCardProps) {
-  const songCount = playlist.songs?.length || 0
-  const [showMenu, setShowMenu] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const { showToast } = useToast()
+  const songCount = playlist.songs?.length || 0;
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowMenu(false)
+        setShowMenu(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleShare = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const shareUrl = `${window.location.origin}/playlist/${playlist.id}`
-    
+    e.preventDefault();
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/playlist/${playlist.id}`;
+
     if (navigator.share) {
       try {
         await navigator.share({
           title: playlist.name,
           text: `Check out "${playlist.name}" playlist on HarmonyHub!`,
           url: shareUrl,
-        })
+        });
       } catch (error) {
-        copyToClipboard(shareUrl)
+        copyToClipboard(shareUrl);
       }
     } else {
-      copyToClipboard(shareUrl)
+      copyToClipboard(shareUrl);
     }
-    setShowMenu(false)
-  }
+    setShowMenu(false);
+  };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast('Link copied to clipboard!', 'success')
-    }).catch(() => {
-      showToast('Failed to copy link', 'error')
-    })
-  }
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showToast("Link copied to clipboard!", "success");
+      })
+      .catch(() => {
+        showToast("Failed to copy link", "error");
+      });
+  };
 
   return (
     <Link href={`/playlist/${playlist.id}`}>
@@ -98,9 +101,9 @@ export function PlaylistCard({ playlist }: PlaylistCardProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setShowMenu(!showMenu)
+                e.preventDefault();
+                e.stopPropagation();
+                setShowMenu(!showMenu);
               }}
               className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-white/70"
             >
@@ -121,6 +124,5 @@ export function PlaylistCard({ playlist }: PlaylistCardProps) {
         </div>
       </div>
     </Link>
-  )
+  );
 }
-

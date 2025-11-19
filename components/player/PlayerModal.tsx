@@ -1,15 +1,26 @@
-"use client"
+"use client";
 
-import { usePlayerStore } from "@/lib/store/player-store"
-import { formatDuration } from "@/lib/utils"
-import { EmptyState } from "@/components/ui/EmptyState"
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Shuffle, Repeat, X, Trash2 } from "lucide-react"
-import Image from "next/image"
-import { useEffect } from "react"
+import { usePlayerStore } from "@/lib/store/player-store";
+import { formatDuration } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  Shuffle,
+  Repeat,
+  X,
+  Trash2,
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect } from "react";
 
 interface PlayerModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
@@ -31,50 +42,50 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
     toggleShuffle,
     toggleRepeat,
     removeFromQueue,
-  } = usePlayerStore()
+  } = usePlayerStore();
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset"
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset"
-    }
-  }, [isOpen])
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        onClose()
+        onClose();
       }
-    }
-    document.addEventListener("keydown", handleEscape)
+    };
+    document.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener("keydown", handleEscape)
-    }
-  }, [isOpen, onClose])
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
 
-  if (!isOpen || !currentSong) return null
+  if (!isOpen || !currentSong) return null;
 
   // Use song duration as fallback if audio duration isn't loaded yet
-  const displayDuration = duration || currentSong.duration || 0
+  const displayDuration = duration || currentSong.duration || 0;
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = parseFloat(e.target.value)
-    setCurrentTime(newTime)
-    const audio = document.querySelector("audio") as HTMLAudioElement
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    const audio = document.querySelector("audio") as HTMLAudioElement;
     if (audio) {
-      audio.currentTime = newTime
+      audio.currentTime = newTime;
     }
-  }
+  };
 
   const handleQueueItemClick = (index: number) => {
     if (index !== currentIndex && index < queue.length) {
-      usePlayerStore.getState().setCurrentIndex(index)
+      usePlayerStore.getState().setCurrentIndex(index);
     }
-  }
+  };
 
   return (
     <div
@@ -116,8 +127,12 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
                 )}
               </div>
               <div className="text-center w-full">
-                <h2 className="text-2xl font-bold mb-2 text-white">{currentSong.title}</h2>
-                <p className="text-white/70 text-lg mb-1">{currentSong.artist}</p>
+                <h2 className="text-2xl font-bold mb-2 text-white">
+                  {currentSong.title}
+                </h2>
+                <p className="text-white/70 text-lg mb-1">
+                  {currentSong.artist}
+                </p>
                 {currentSong.album && (
                   <p className="text-white/50 text-sm">{currentSong.album}</p>
                 )}
@@ -161,17 +176,27 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium truncate ${index === currentIndex ? "text-primary" : "text-white"}`}>
+                        <p
+                          className={`font-medium truncate ${
+                            index === currentIndex
+                              ? "text-primary"
+                              : "text-white"
+                          }`}
+                        >
                           {song.title}
                         </p>
-                        <p className="text-sm text-white/70 truncate">{song.artist}</p>
+                        <p className="text-sm text-white/70 truncate">
+                          {song.artist}
+                        </p>
                       </div>
-                      <span className="text-xs text-white/50">{formatDuration(song.duration)}</span>
+                      <span className="text-xs text-white/50">
+                        {formatDuration(song.duration)}
+                      </span>
                       {index !== currentIndex && (
                         <button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            removeFromQueue(index)
+                            e.stopPropagation();
+                            removeFromQueue(index);
                           }}
                           className="p-1.5 hover:bg-white/10 rounded-full transition-colors opacity-0 group-hover:opacity-100"
                         >
@@ -243,7 +268,9 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
               >
                 <Repeat className="h-5 w-5" />
                 {repeat === "one" && (
-                  <span className="absolute top-0 right-0 text-[8px] font-bold text-primary">1</span>
+                  <span className="absolute top-0 right-0 text-[8px] font-bold text-primary">
+                    1
+                  </span>
                 )}
               </button>
             </div>
@@ -252,8 +279,8 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => {
-                  const newVolume = volume > 0 ? 0 : 1
-                  setVolume(newVolume)
+                  const newVolume = volume > 0 ? 0 : 1;
+                  setVolume(newVolume);
                 }}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
               >
@@ -277,6 +304,5 @@ export function PlayerModal({ isOpen, onClose }: PlayerModalProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

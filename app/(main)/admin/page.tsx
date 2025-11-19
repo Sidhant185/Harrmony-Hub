@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { isAdmin } from "@/lib/admin"
 import {
   Shield,
@@ -403,9 +404,11 @@ export default function AdminPage() {
                         className="bg-[#181818] rounded-lg p-4 border border-white/10 flex items-center gap-3"
                       >
                         {user.image ? (
-                          <img
+                          <Image
                             src={user.image}
                             alt={user.name || "User"}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded-full"
                           />
                         ) : (
@@ -445,9 +448,11 @@ export default function AdminPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           {user.image ? (
-                            <img
+                            <Image
                               src={user.image}
                               alt={user.name || "User"}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full"
                             />
                           ) : (
@@ -553,9 +558,11 @@ export default function AdminPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           {song.coverArt ? (
-                            <img
+                            <Image
                               src={song.coverArt}
                               alt={song.title}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded object-cover"
                             />
                           ) : (
@@ -617,9 +624,11 @@ export default function AdminPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           {playlist.coverArt ? (
-                            <img
+                            <Image
                               src={playlist.coverArt}
                               alt={playlist.name}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded object-cover"
                             />
                           ) : (
